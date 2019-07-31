@@ -55,19 +55,61 @@ function errorHandler(evt){
 
 // This is where the data processing functions are
 function wrapUpTime(data){
-  const REVERSE_DATA = data.reverse();
-  let dayTracker = new Date(REVERSE_DATA[0][TIME]);
+  const DATA = removeLines(data);
+
+  let dayTracker = new Date(formatDate(DATA[0][TIME]));
+  let wrapUpTimeSum = 0;
+  let dayCount = 0;
 
   //begin main loop
-  for(let i=0; i<REVERSE_DATA.length; i++){
-    //Does the call fit the criterea?
-    if (REVERSE_DATA[i][DURATION] > 20 &&
-      REVERSE_DATA[i][CALLSTATUS] != "INBOUND UNANSWERED") {
-      let currentDay = new Date(REVERSE_DATA[i][TIME]);
-      //Is the call the same day?
-      if(currentDay.getDate() == dayTracker.getDate()){
+  for(let i=0; i<DATA.length - 1; i++){
+    let currentDay = new Date(DATA[i][TIME]);
+    let nextCall = new Date(DATA[i+1][TIME])
+    //This is the time at end of call in ms
+    let endOfCall = currentDay.getTime() + (DATA[i][DURATION] * 1000)
 
+    //Is the call the same day? if not update the dayTracker and run same check
+    if(currentDay.getDate() == dayTracker.getDate()){
+      // check that the call isnt longer than the next action (this would mean its not the salespersons call)
+      if(endOfCall < nextCall.getTime()){
+        wrapUpTimeSum += endOfCall - nextCall.getTime();
+      }
+    } else {
+      dayTracker.setDate(currentDay.getDate());
+      dayCount += 1;
+      if(endOfCall < nextCall.getTime()){
+        wrapUpTimeSum += endOfCall - nextCall.getTime();
       }
     }
   }
+  if(wrapUpTimeSum == 0){
+    console.log("Error No Calls to Parse");
+    console.log(DATA);
+  } else {
+    console.log(wrapUpTimeSum / dayCount);
+  }
+}
+
+//creates datetime arguments
+function formatDate(date){
+
+  let split = date.split(" ");
+  let dateSplit = split[0].split("/");
+  let timeSplit = split[1].split(":");
+  let y=parseInt(dateSplit[2]), m=parseInt(dateSplit[1]-1), d=parseInt(dateSplit[0]),
+  hh=parseInt(timeSplit[0]), mm=parseInt(timeSplit[1]), ss=parseInt(timeSplit[2]);
+  return y, m, d, hh, mm, ss;
+
+}
+
+//Removes lines we dont want and reverses the data
+function removeLines(data){
+  data.splice(0,1);
+  //newData = data.reverse();
+  for(let i=0; i < data.length; i++){
+    if (data[i][DURATION] < 20 || data[i][CALLSTATUS] == "INBOUND UNANSWERED") {
+        data.splice(i,1);
+    }
+  }
+  return data;
 }
