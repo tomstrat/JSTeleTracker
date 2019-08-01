@@ -63,22 +63,24 @@ function wrapUpTime(data){
 
   //begin main loop
   for(let i=0; i<DATA.length - 1; i++){
-    let currentDay = new Date(DATA[i][TIME]);
-    let nextCall = new Date(DATA[i+1][TIME])
+    let currentDay = new Date(formatDate(DATA[i][TIME]));
+    let nextCall = new Date(formatDate(DATA[i+1][TIME]))
     //This is the time at end of call in ms
     let endOfCall = currentDay.getTime() + (DATA[i][DURATION] * 1000)
 
     //Is the call the same day? if not update the dayTracker and run same check
     if(currentDay.getDate() == dayTracker.getDate()){
-      // check that the call isnt longer than the next action (this would mean its not the salespersons call)
-      if(endOfCall < nextCall.getTime()){
-        wrapUpTimeSum += endOfCall - nextCall.getTime();
+      // check that the call isnt longer than the next action (this would mean its not the salespersons call) & is on the same day
+      if(endOfCall < nextCall.getTime() && currentDay.getDate() == nextCall.getDate()){
+        wrapUpTimeSum += nextCall.getTime() - endOfCall;
+        console.log("Same day is: " + (nextCall.getTime() - endOfCall));
       }
     } else {
       dayTracker.setDate(currentDay.getDate());
       dayCount += 1;
       if(endOfCall < nextCall.getTime()){
-        wrapUpTimeSum += endOfCall - nextCall.getTime();
+        wrapUpTimeSum += nextCall.getTime() - endOfCall;
+        console.log("Next day is: " + (nextCall.getTime() - endOfCall));
       }
     }
   }
@@ -96,20 +98,33 @@ function formatDate(date){
   let split = date.split(" ");
   let dateSplit = split[0].split("/");
   let timeSplit = split[1].split(":");
-  let y=parseInt(dateSplit[2]), m=parseInt(dateSplit[1]-1), d=parseInt(dateSplit[0]),
-  hh=parseInt(timeSplit[0]), mm=parseInt(timeSplit[1]), ss=parseInt(timeSplit[2]);
-  return y, m, d, hh, mm, ss;
+  //Month is 0 indexed so need to lower it by 1
+  let zeroMonth = parseInt(dateSplit[1], 10)-1
+
+  // this will add the leading 0 back on if the number is below 10
+  if(zeroMonth < 10){
+    zeroMonth =  "0" + zeroMonth.toString();
+  } else {
+    zeroMonth = zeroMonth.toString();
+  }
+  //concatanate it all into a string
+  let dateString = dateSplit[2] + "-" + zeroMonth + "-" + dateSplit[0] + "T" +
+  timeSplit[0] + ':' + timeSplit[1] + ':' + timeSplit[2];
+
+  return dateString
 
 }
 
 //Removes lines we dont want and reverses the data
 function removeLines(data){
   data.splice(0,1);
-  //newData = data.reverse();
-  for(let i=0; i < data.length; i++){
-    if (data[i][DURATION] < 20 || data[i][CALLSTATUS] == "INBOUND UNANSWERED") {
-        data.splice(i,1);
+  newData = data.reverse();
+  for(let i=0; i < newData.length; i++){
+    if (newData[i][DURATION] < 20 || newData[i][CALLSTATUS] == "INBOUND UNANSWERED") {
+        newData.splice(i,1);
+        i--;
     }
   }
-  return data;
+  console.log(newData);
+  return newData;
 }
