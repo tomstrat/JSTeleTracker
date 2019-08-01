@@ -98,17 +98,8 @@ function formatDate(date){
   let split = date.split(" ");
   let dateSplit = split[0].split("/");
   let timeSplit = split[1].split(":");
-  //Month is 0 indexed so need to lower it by 1
-  let zeroMonth = parseInt(dateSplit[1], 10)-1
-
-  // this will add the leading 0 back on if the number is below 10
-  if(zeroMonth < 10){
-    zeroMonth =  "0" + zeroMonth.toString();
-  } else {
-    zeroMonth = zeroMonth.toString();
-  }
   //concatanate it all into a string
-  let dateString = dateSplit[2] + "-" + zeroMonth + "-" + dateSplit[0] + "T" +
+  let dateString = dateSplit[2] + "-" + dateSplit[1] + "-" + dateSplit[0] + "T" +
   timeSplit[0] + ':' + timeSplit[1] + ':' + timeSplit[2];
 
   return dateString
