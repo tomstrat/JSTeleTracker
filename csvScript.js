@@ -7,7 +7,7 @@ const TIME = 1;
 const DURATION = 2;
 const CALLSTATUS = 5;
 
-
+//This section deals with reading in the CSV
 function handleFiles (files){
   // Check for the various File API support.
   if (window.File && window.FileReader) {
@@ -44,6 +44,7 @@ function processData(csv){
   }
   console.log(mainData);
   wrapUpTime(mainData);
+  callDuration(mainData);
 }
 
 function errorHandler(evt){
@@ -54,6 +55,8 @@ function errorHandler(evt){
 
 
 // This is where the data processing functions are
+
+//***WRAP UP TIME***
 function wrapUpTime(data){
   const DATA = removeLines(data);
 
@@ -73,14 +76,14 @@ function wrapUpTime(data){
       // check that the call isnt longer than the next action (this would mean its not the salespersons call) & is on the same day
       if(endOfCall < nextCall.getTime() && currentDay.getDate() == nextCall.getDate()){
         wrapUpTimeSum += nextCall.getTime() - endOfCall;
-        console.log("Same day is: " + (nextCall.getTime() - endOfCall));
+        //console.log("Same day is: " + getTimeBreakdown((nextCall.getTime() - endOfCall)));
       }
     } else {
       dayTracker.setDate(currentDay.getDate());
       dayCount += 1;
       if(endOfCall < nextCall.getTime()){
         wrapUpTimeSum += nextCall.getTime() - endOfCall;
-        console.log("Next day is: " + (nextCall.getTime() - endOfCall));
+        //console.log("Next day is: " + getTimeBreakdown((nextCall.getTime() - endOfCall)));
       }
     }
   }
@@ -88,9 +91,36 @@ function wrapUpTime(data){
     console.log("Error No Calls to Parse");
     console.log(DATA);
   } else {
-    console.log(wrapUpTimeSum / dayCount);
+    console.log("Average Wrap Up time is: " + getTimeBreakdown(Math.floor(wrapUpTimeSum / dayCount)));
   }
 }
+
+//*** AVG CALL DURATION ***
+//Note: this does not take into account time travel calls (not taken by agent)
+function callDuration(data){
+  const DATA = data;
+  let durationSum = 0;
+
+  for(let i=0; i < DATA.length; i++){
+    durationSum += parseInt(DATA[i][DURATION])
+  }
+
+  if(durationSum == 0){
+    console.log("Error No Calls to Parse");
+    console.log(DATA);
+  } else {
+    console.log("Average Duration is: " + getTimeBreakdown(Math.floor(durationSum / DATA.length)* 1000));
+  }
+
+}
+
+//*** AVG CALLS PER DAY & CALLS MADE PER MONTH ***
+//Note: this does not take into account time travel calls (not taken by agent)
+function callsMade(data){
+
+}
+
+
 
 //creates datetime arguments
 function formatDate(date){
@@ -107,6 +137,8 @@ function formatDate(date){
 }
 
 //Removes lines we dont want and reverses the data
+//THIS AFFECTS THE DATA PERMENANTLY INCLUDING REFERENCES TO DATA PREVIOUSLY
+//ONLY NEEDS TO BE RUN ONCE
 function removeLines(data){
   data.splice(0,1);
   newData = data.reverse();
@@ -118,4 +150,42 @@ function removeLines(data){
   }
   console.log(newData);
   return newData;
+}
+
+//breaks down milliseconds into useful time format
+function getTimeBreakdown(milliseconds){
+  let seconds = Math.floor(milliseconds / 1000);
+  let minuets;
+  let hours;
+
+  // work out the total duration broken down
+  if(seconds > 60){
+    minuets = Math.floor(seconds / 60);
+    seconds = seconds % 60;
+    if(minuets > 60){
+      hours = Math.floor(minuets / 60);
+      minuets = minuets % 60;
+    } else {
+      hours = 0;
+    }
+  } else {
+    minuets = 0;
+    hours = 0;
+  }
+
+  //Add leading 0 if lower than 10
+  if(seconds < 10){
+    seconds.toString();
+    seconds = "0" + seconds;
+  }
+  if(minuets < 10){
+    minuets.toString();
+    minuets = "0" + minuets;
+  }
+  if(hours < 10){
+    hours.toString();
+    hours = "0" + hours;
+  }
+
+  return hours + ":" + minuets + ":" + seconds;
 }
