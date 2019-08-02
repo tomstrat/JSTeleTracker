@@ -117,7 +117,9 @@ function callDuration(data){
 //*** AVG CALLS PER DAY & CALLS MADE PER MONTH ***
 //Note: this does not take into account time travel calls (not taken by agent)
 function callsMade(data){
-
+  const DATA = data;
+  let callsCount = 0;
+  let dayCount = 0;
 }
 
 
