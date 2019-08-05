@@ -43,8 +43,12 @@ function processData(csv){
     mainData.push(tarr);
   }
   console.log(mainData);
+
+  //Run a quick check over data before it gets wrecked by the reverse.
+  let totalCallsMade = callsMade(mainData);
+
   wrapUpTime(mainData);
-  callDuration(mainData);
+  callDuration(mainData, totalCallsMade);
 }
 
 function errorHandler(evt){
@@ -53,74 +57,9 @@ function errorHandler(evt){
   }
 }
 
+//Sucess Output
+function outputData()
 
-// This is where the data processing functions are
-
-//***WRAP UP TIME***
-function wrapUpTime(data){
-  const DATA = removeLines(data);
-
-  let dayTracker = new Date(formatDate(DATA[0][TIME]));
-  let wrapUpTimeSum = 0;
-  let dayCount = 0;
-
-  //begin main loop
-  for(let i=0; i<DATA.length - 1; i++){
-    let currentDay = new Date(formatDate(DATA[i][TIME]));
-    let nextCall = new Date(formatDate(DATA[i+1][TIME]))
-    //This is the time at end of call in ms
-    let endOfCall = currentDay.getTime() + (DATA[i][DURATION] * 1000)
-
-    //Is the call the same day? if not update the dayTracker and run same check
-    if(currentDay.getDate() == dayTracker.getDate()){
-      // check that the call isnt longer than the next action (this would mean its not the salespersons call) & is on the same day
-      if(endOfCall < nextCall.getTime() && currentDay.getDate() == nextCall.getDate()){
-        wrapUpTimeSum += nextCall.getTime() - endOfCall;
-        //console.log("Same day is: " + getTimeBreakdown((nextCall.getTime() - endOfCall)));
-      }
-    } else {
-      dayTracker.setDate(currentDay.getDate());
-      dayCount += 1;
-      if(endOfCall < nextCall.getTime()){
-        wrapUpTimeSum += nextCall.getTime() - endOfCall;
-        //console.log("Next day is: " + getTimeBreakdown((nextCall.getTime() - endOfCall)));
-      }
-    }
-  }
-  if(wrapUpTimeSum == 0){
-    console.log("Error No Calls to Parse");
-    console.log(DATA);
-  } else {
-    console.log("Average Wrap Up time is: " + getTimeBreakdown(Math.floor(wrapUpTimeSum / dayCount)));
-  }
-}
-
-//*** AVG CALL DURATION ***
-//Note: this does not take into account time travel calls (not taken by agent)
-function callDuration(data){
-  const DATA = data;
-  let durationSum = 0;
-
-  for(let i=0; i < DATA.length; i++){
-    durationSum += parseInt(DATA[i][DURATION])
-  }
-
-  if(durationSum == 0){
-    console.log("Error No Calls to Parse");
-    console.log(DATA);
-  } else {
-    console.log("Average Duration is: " + getTimeBreakdown(Math.floor(durationSum / DATA.length)* 1000));
-  }
-
-}
-
-//*** AVG CALLS PER DAY & CALLS MADE PER MONTH ***
-//Note: this does not take into account time travel calls (not taken by agent)
-function callsMade(data){
-  const DATA = data;
-  let callsCount = 0;
-  let dayCount = 0;
-}
 
 
 
@@ -139,7 +78,7 @@ function formatDate(date){
 }
 
 //Removes lines we dont want and reverses the data
-//THIS AFFECTS THE DATA PERMENANTLY INCLUDING REFERENCES TO DATA PREVIOUSLY
+//THIS AFFECTS THE DATA PERMENANTLY ANYTHING IN THE THREAD AFTER THIS WILL SEE THIS DATA INSTEAD
 //ONLY NEEDS TO BE RUN ONCE
 function removeLines(data){
   data.splice(0,1);
@@ -190,4 +129,94 @@ function getTimeBreakdown(milliseconds){
   }
 
   return hours + ":" + minuets + ":" + seconds;
+}
+
+
+
+
+
+// This is where the data processing functions are
+
+//*** WRAP UP TIME ***
+function wrapUpTime(data){
+  const DATA = removeLines(data);
+
+  let dayTracker = new Date(formatDate(DATA[0][TIME]));
+  let wrapUpTimeSum = 0;
+  let dayCount = 1;
+
+  //begin main loop
+  for(let i=0; i<DATA.length - 1; i++){
+    let currentDay = new Date(formatDate(DATA[i][TIME]));
+    let nextCall = new Date(formatDate(DATA[i+1][TIME]))
+    //This is the time at end of call in ms
+    let endOfCall = currentDay.getTime() + (DATA[i][DURATION] * 1000)
+
+    //Is the call the same day? if not update the dayTracker and run same check
+    if(currentDay.getDate() == dayTracker.getDate()){
+      // check that the call isnt longer than the next action (this would mean its not the salespersons call) & is on the same day
+      if(endOfCall < nextCall.getTime() && currentDay.getDate() == nextCall.getDate()){
+        wrapUpTimeSum += nextCall.getTime() - endOfCall;
+      }
+    } else {
+      dayTracker.setDate(currentDay.getDate());
+      dayCount += 1;
+      if(endOfCall < nextCall.getTime()){
+        wrapUpTimeSum += nextCall.getTime() - endOfCall;
+      }
+    }
+  }
+  if(wrapUpTimeSum == 0){
+    console.log("Error No Calls to Parse");
+    console.log(DATA);
+  } else {
+    console.log("Average Wrap Up time is: " + getTimeBreakdown(Math.floor(wrapUpTimeSum / DATA.length))); // Dividing by calls not days
+  }
+}
+
+//*** AVG CALL DURATION & AVG TIME ON PHONE PER DAY***
+//Note: this does not take into account time travel calls (not taken by agent)
+function callDuration(data, callsMade){
+  const DATA = data;
+  let durationSum = 0;
+  let dayTracker = new Date(formatDate(DATA[0][TIME]));
+  let dayCount = 1;
+
+  for(let i=0; i < DATA.length; i++){
+    let currentDay = new Date(formatDate(DATA[i][TIME]));
+
+    if(currentDay.getDate() == dayTracker.getDate()){
+      durationSum += parseInt(DATA[i][DURATION]);
+    } else {
+      durationSum += parseInt(DATA[i][DURATION]);
+      dayTracker = currentDay;
+      dayCount += 1;
+    }
+  }
+
+  if(durationSum == 0){
+    console.log("Error No Calls to Parse");
+    console.log(DATA);
+  } else {
+    console.log("Average Duration is: " + getTimeBreakdown(Math.floor(durationSum / DATA.length)* 1000));
+    console.log("Average Time on Phone is: " + getTimeBreakdown(Math.floor(durationSum / dayCount)* 1000));
+    console.log("Average Calls Made per day is: " + callsMade / dayCount);
+    console.log("Calls made this month: " + callsMade);
+  }
+
+}
+
+
+//*** AVG CALLS PER DAY & CALLS MADE PER MONTH ***
+//Note this is only to work out the calls made before data is ruined.
+//Note: this does not take into account time travel calls (not taken by agent)
+function callsMade(data){
+  const DATA = data;
+  let callCount = 0;
+  for(let i=0; i<DATA.length; i++){
+    if(DATA[i][CALLSTATUS] != "INBOUND UNANSWERED"){
+      callCount +=1;
+    }
+  }
+  return callCount;
 }
