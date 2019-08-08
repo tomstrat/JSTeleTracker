@@ -68,6 +68,12 @@ function formatDate(date){
   let split = date.split(" ");
   let dateSplit = split[0].split("/");
   let timeSplit = split[1].split(":");
+
+  //check for 24 hour
+  if(split[2] == "PM"){
+    let twentyFour = parseInt(timeSplit[0]) + 12;
+    timeSplit[0] = twentyFour.toString();
+  }
   //concatanate it all into a string
   let dateString = dateSplit[2] + "-" + dateSplit[1] + "-" + dateSplit[0] + "T" +
   timeSplit[0] + ':' + timeSplit[1] + ':' + timeSplit[2];
