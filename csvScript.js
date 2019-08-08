@@ -70,7 +70,7 @@ function formatDate(date){
   let timeSplit = split[1].split(":");
 
   //check for 24 hour
-  if(split[2] == "PM"){
+  if(split[2] == "PM" && timeSplit[0] != "12"){
     let twentyFour = parseInt(timeSplit[0]) + 12;
     timeSplit[0] = twentyFour.toString();
   }
@@ -180,8 +180,22 @@ function wrapUpTime(data){
     } else {
       dayTracker.setDate(currentDay.getDate());
       dayCount += 1;
-      if(endOfCall < nextCall.getTime()){
-        wrapUpTimeSum += nextCall.getTime() - endOfCall;
+      // check that the call isnt longer than the next action (this would mean its not the salespersons call) & is on the same day
+      while(true){
+        if(endOfCall < nextCall.getTime() && currentDay.getDate() == nextCall.getDate()){
+          wrapUpTimeSum += nextCall.getTime() - endOfCall;
+          skipCall -= 1;
+          i += skipCall;
+          break;
+        } else {
+          //check we have not gone to next day because of last call
+          if(currentDay.getDate() != nextCall.getDate()){
+            break;
+          }
+          //If we are here its because we need to check the next next call for end of call and skip the calls that werent the agents
+          skipCall += 1;
+          nextCall = new Date(formatDate(DATA[i+skipCall][TIME]));
+        }
       }
     }
   }
