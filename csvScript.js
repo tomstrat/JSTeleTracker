@@ -173,8 +173,12 @@ function wrapUpTime(data){
             break;
           }
           //If we are here its because we need to check the next next call for end of call and skip the calls that werent the agents
-          skipCall += 1;
-          nextCall = new Date(formatDate(DATA[i+skipCall][TIME]));
+          if(i + skipCall == DATA.length - 1){
+            break;
+          } else {
+            skipCall += 1;
+            nextCall = new Date(formatDate(DATA[i+skipCall][TIME]));
+          }
         }
       }
     } else {
@@ -193,8 +197,12 @@ function wrapUpTime(data){
             break;
           }
           //If we are here its because we need to check the next next call for end of call and skip the calls that werent the agents
-          skipCall += 1;
-          nextCall = new Date(formatDate(DATA[i+skipCall][TIME]));
+          if(i + skipCall == DATA.length - 1){
+            break;
+          } else {
+            skipCall += 1;
+            nextCall = new Date(formatDate(DATA[i+skipCall][TIME]));
+          }
         }
       }
     }
