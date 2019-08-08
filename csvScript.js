@@ -58,9 +58,7 @@ function errorHandler(evt){
 }
 
 //Sucess Output
-function outputData() {
 
-}
 
 
 
@@ -148,6 +146,7 @@ function wrapUpTime(data){
 
   //begin main loop
   for(let i=0; i<DATA.length - 1; i++){
+    let skipCall = 1;
     let currentDay = new Date(formatDate(DATA[i][TIME]));
     let nextCall = new Date(formatDate(DATA[i+1][TIME]))
     //This is the time at end of call in ms
@@ -156,8 +155,21 @@ function wrapUpTime(data){
     //Is the call the same day? if not update the dayTracker and run same check
     if(currentDay.getDate() == dayTracker.getDate()){
       // check that the call isnt longer than the next action (this would mean its not the salespersons call) & is on the same day
-      if(endOfCall < nextCall.getTime() && currentDay.getDate() == nextCall.getDate()){
-        wrapUpTimeSum += nextCall.getTime() - endOfCall;
+      while(true){
+        if(endOfCall < nextCall.getTime() && currentDay.getDate() == nextCall.getDate()){
+          wrapUpTimeSum += nextCall.getTime() - endOfCall;
+          skipCall -= 1;
+          i += skipCall;
+          break;
+        } else {
+          //check we have not gone to next day because of last call
+          if(currentDay.getDate() != nextCall.getDate()){
+            break;
+          }
+          //If we are here its because we need to check the next next call for end of call and skip the calls that werent the agents
+          skipCall += 1;
+          nextCall = new Date(formatDate(DATA[i+skipCall][TIME]));
+        }
       }
     } else {
       dayTracker.setDate(currentDay.getDate());
