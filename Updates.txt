@@ -1,2 +1,1 @@
 Page requires refresh each new csv parsed
-Calls made per day returning float
