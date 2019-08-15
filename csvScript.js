@@ -49,6 +49,7 @@ function processData(csv){
 
   wrapUpTime(mainData);
   callDuration(mainData, totalCallsMade);
+  document.getElementById("fileUpload").value = "";
 }
 
 function errorHandler(evt){
@@ -241,7 +242,7 @@ function callDuration(data, callsMade){
   } else {
     console.log("Average Duration is: " + getTimeBreakdown(Math.floor(durationSum / DATA.length)* 1000));
     console.log("Average Time on Phone is: " + getTimeBreakdown(Math.floor(durationSum / dayCount)* 1000));
-    console.log("Average Calls Made per day is: " + Math.floor(callsMade / dayCount);
+    console.log("Average Calls Made per day is: " + Math.floor(callsMade / dayCount));
     console.log("Calls made this month: " + callsMade);
   }
 
