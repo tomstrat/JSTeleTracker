@@ -257,7 +257,7 @@ function callsMade(data){
   const DATA = data;
   let callCount = 0;
   for(let i=0; i<DATA.length; i++){
-    if(DATA[i][CALLSTATUS] != "INBOUND UNANSWERED" || DATA[i][CALLSTATUS] != "INBOUND ANSWERED"){
+    if(DATA[i][CALLSTATUS] != "INBOUND UNANSWERED" && DATA[i][CALLSTATUS] != "INBOUND ANSWERED"){
       callCount +=1;
     }
   }
