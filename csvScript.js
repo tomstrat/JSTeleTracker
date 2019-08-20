@@ -50,6 +50,7 @@ function processData(csv){
   wrapUpTime(mainData);
   callDuration(mainData, totalCallsMade);
   document.getElementById("fileUpload").value = "";
+  mainData = [];
 }
 
 function errorHandler(evt){
