@@ -45,11 +45,7 @@ function processData(csv){
   console.log(mainData);
 
   //Run a quick check over data before it gets wrecked by the reverse.
-  let totalCallsMade = callsMade(mainData);
-
-  wrapUpTime(mainData);
-  callDuration(mainData, totalCallsMade);
-  document.getElementById("fileUpload").value = "";
+  getData(mainData);
   mainData = [];
 }
 
@@ -59,8 +55,16 @@ function errorHandler(evt){
   }
 }
 
-//Sucess Output
+//Get Data Output
+function getData(rawData){
+  //Run a quick check over data before it gets wrecked by the reverse.
+  let totalCallsMade = callsMade(rawData);
 
+  wrapUpTime(rawData);
+  callDuration(rawData, totalCallsMade);
+  document.getElementById("fileUpload").value = "";
+  mainData = [];
+}
 
 
 
