@@ -59,9 +59,20 @@ function errorHandler(evt){
 function getData(rawData){
   //Run a quick check over data before it gets wrecked by the reverse.
   let totalCallsMade = callsMade(rawData);
+  let getWrapTime = wrapUpTime(rawData);
+  let callData = callDuration(rawData, totalCallsMade);
 
-  wrapUpTime(rawData);
-  callDuration(rawData, totalCallsMade);
+  //For efficiency callDuration returns an object with the other data. So group this up for simplicity
+  let callDataObject = {
+    wrapTime: getWrapTime,
+    avgDuration: callData.avgDuration,
+    avgTime: callData.avgTime,
+    avgCalls: callData.avgCalls,
+    totalCalls:callData.totalCalls
+  };
+  
+
+  //Reset the data array
   document.getElementById("fileUpload").value = "";
   mainData = [];
 }
@@ -218,6 +229,7 @@ function wrapUpTime(data){
     console.log(DATA);
   } else {
     console.log("Average Wrap Up time is: " + getTimeBreakdown(Math.floor(wrapUpTimeSum / DATA.length))); // Dividing by calls not days
+    return(getTimeBreakdown(Math.floor(wrapUpTimeSum / DATA.length)));
   }
 }
 
@@ -225,6 +237,12 @@ function wrapUpTime(data){
 //Note: this does not take into account time travel calls (not taken by agent)
 function callDuration(data, callsMade){
   const DATA = data;
+  let callDataObject = {
+    avgDuration: 0,
+    avgTime: 0,
+    avgCalls: 0,
+    totalCalls:0
+  };
   let durationSum = 0;
   let dayTracker = new Date(formatDate(DATA[0][TIME]));
   let dayCount = 1;
@@ -249,6 +267,11 @@ function callDuration(data, callsMade){
     console.log("Average Time on Phone is: " + getTimeBreakdown(Math.floor(durationSum / dayCount)* 1000));
     console.log("Average Calls Made per day is: " + Math.floor(callsMade / dayCount));
     console.log("Calls made this month: " + callsMade);
+    callDataObject.avgDuration = getTimeBreakdown(Math.floor(durationSum / DATA.length)* 1000);
+    callDataObject.avgTime = getTimeBreakdown(Math.floor(durationSum / dayCount)* 1000);
+    callDataObject.avgCalls = Math.floor(callsMade / dayCount);
+    callDataObject.totalCalls = callsMade;
+    return callDataObject;
   }
 
 }
