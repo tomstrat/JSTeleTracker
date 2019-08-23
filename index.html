@@ -12,13 +12,44 @@
     span{
       font-size: 20px;
     }
+    #dataTable{
+      width: 50%;
+      margin: 50px auto;
+      border: 2px solid black;
+    }
+    td{
+      border: 1px solid black;
+      height: 20px;
+      width: 7.5em;
+    }
+    #headRow td{
+      border:none;
+      padding: 5px 0px;
+      border-right: 1px solid black;
+      border-left: 1px solid black;
+      border-bottom: 3px solid black;
+      background-color: #0065BD;
+      color: white;
+    }
   </style>
   <script src="./csvScript.js"></script>
 </head>
 <body>
 
-  <h1>CSV Reader<h1>
-  <span>Select a file: <span><input  onchange="handleFiles(this.files)" id="fileUpload" type="file" name="myFile" accept=".csv"><br>
+  <h1>CSV Reader</h1>
+  <span>Select a file: </span><input  onchange="handleFiles(this.files)" id="fileUpload" type="file" name="myFile" accept=".csv"><br>
+  <div id="dataTable">
+    <table cellspacing="0" cellpadding="0">
+      <tr id="headRow">
+        <td data-id="cellName">Name</td>
+        <td data-id="cellWrap">Wrap-up</td>
+        <td data-id="cellAvgTime">Avg Time</td>
+        <td data-id="cellAvgDuration">Avg Duration</td>
+        <td data-id="cellAvgCalls">Avg Calls</td>
+        <td data-id="cellTotalCalls">Total Calls</td>
+      </tr>
+    </table>
+  </div>
 
 </body>
 
