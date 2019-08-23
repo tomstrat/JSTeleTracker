@@ -39,12 +39,12 @@
   <h1>CSV Reader</h1>
   <span>Select a file: </span><input  onchange="handleFiles(this.files)" id="fileUpload" type="file" name="myFile" accept=".csv"><br>
   <div id="dataTable">
-    <table cellspacing="0" cellpadding="0">
+    <table cellspacing="0" cellpadding="0" id="mainTable">
       <tr id="headRow">
         <td data-id="cellName">Name</td>
+        <td data-id="cellAvgDuration">Avg Duration</td>
         <td data-id="cellWrap">Wrap-up</td>
         <td data-id="cellAvgTime">Avg Time</td>
-        <td data-id="cellAvgDuration">Avg Duration</td>
         <td data-id="cellAvgCalls">Avg Calls</td>
         <td data-id="cellTotalCalls">Total Calls</td>
       </tr>

@@ -70,13 +70,42 @@ function getData(rawData){
     avgCalls: callData.avgCalls,
     totalCalls:callData.totalCalls
   };
-  
+
+  makeTableRow(callDataObject);
 
   //Reset the data array
   document.getElementById("fileUpload").value = "";
   mainData = [];
 }
 
+//Create the row on end of the table
+function makeTableRow(rowData){
+
+  let table = document.getElementById('mainTable');
+  let row = document.createElement('tr');
+  let nameData = document.createElement('td', {dataID: "cellName"});
+  let durationData = document.createElement('td', {dataID: "cellAvgDuration"});
+  let wrapData = document.createElement('td', {dataID: "cellWrap"});
+  let timeData = document.createElement('td', {dataID: "cellAvgTime"});
+  let callsData = document.createElement('td', {dataID: "cellAvgCalls"});
+  let totalData = document.createElement('td', {dataID: "cellTotalCalls"});
+
+  nameData.innerHTML = "";
+  durationData.innerHTML = rowData.avgDuration;
+  wrapData.innerHTML = rowData.wrapTime;
+  timeData.innerHTML = rowData.avgTime;
+  callsData.innerHTML = rowData.avgCalls;
+  totalData.innerHTML = rowData.totalCalls;
+
+  row.appendChild(nameData);
+  row.appendChild(durationData);
+  row.appendChild(wrapData);
+  row.appendChild(timeData);
+  row.appendChild(callsData);
+  row.appendChild(totalData);
+  table.appendChild(row);
+
+}
 
 
 //creates datetime arguments
